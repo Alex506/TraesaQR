@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:provider/provider.dart';
-import 'package:traesa_qr/state/qr_state.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -32,8 +30,8 @@ class _HomePageState extends State<HomePage> {
               ),
               TextButton(
                 style: TextButton.styleFrom(),
-                onPressed: () => scanQR,
-                child: Text("Escanear"),
+                onPressed: () => scanQR(),
+                child: Text("Escanear QR"),
               )
             ],
           ),
@@ -43,8 +41,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void scanQR() async {
-    final qr_state = Provider.of<QR_State>(context, listen: false);
     String barcodeScanRes;
+    print("camera");
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
@@ -53,10 +51,15 @@ class _HomePageState extends State<HomePage> {
         true,
         ScanMode.QR,
       );
-      qr_state.qrCode = barcodeScanRes;
-      Navigator.pushNamed(context, 'verify');
+      print(barcodeScanRes.split(";")[2]);
+      Navigator.pushNamed(
+        context,
+        'verify',
+        arguments: {'qrCode': barcodeScanRes.split(";")[2]},
+      );
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
+      print("failed");
     }
   }
 }
