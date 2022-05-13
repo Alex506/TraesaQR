@@ -10,6 +10,7 @@ class MyApp extends StatelessWidget {
     return (MaterialApp(
       title: 'Traesa QR',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Gotham'),
       initialRoute: 'home',
       routes: {
         'home': (context) => HomePage(),

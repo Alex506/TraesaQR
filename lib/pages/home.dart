@@ -24,15 +24,41 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 20),
               Container(
                 child: Column(children: [
-                  Text("Traesa QR"),
-                  Text("Escanear código QR"),
+                  Text(
+                    "Traesa QR",
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff333F48),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Escanear código QR",
+                    style: TextStyle(
+                      color: Color(0xff333F48),
+                    ),
+                  ),
                 ]),
               ),
-              TextButton(
-                style: TextButton.styleFrom(),
-                onPressed: () => scanQR(),
-                child: Text("Escanear QR"),
-              )
+              SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: TextButton(
+                  onPressed: () => scanQR(),
+                  child: Text("Escanear QR"),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor: Color(0xffF37021),
+                    shape: const StadiumBorder(),
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -43,7 +69,6 @@ class _HomePageState extends State<HomePage> {
   void scanQR() async {
     String barcodeScanRes;
     print("camera");
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
         '#ff6666',
@@ -51,12 +76,14 @@ class _HomePageState extends State<HomePage> {
         true,
         ScanMode.QR,
       );
-      print(barcodeScanRes.split(";")[2]);
-      Navigator.pushNamed(
-        context,
-        'verify',
-        arguments: {'qrCode': barcodeScanRes.split(";")[2]},
-      );
+      if (barcodeScanRes != "-1") {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          'verify',
+          (route) => false,
+          arguments: {'qrCode': barcodeScanRes.split(";")[2]},
+        );
+      }
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
       print("failed");
