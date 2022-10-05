@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,21 +15,22 @@ class _VerifyPageState extends State<VerifyPage> {
         ModalRoute.of(context)?.settings.arguments as Map<String, String>;
     return Scaffold(
       body: Center(
-        child: FutureBuilder<bool>(
+        child: FutureBuilder(
           future: apiCall(routes['qrCode'].toString()),
-          builder: (context, snapshot) {
+          builder: (context, AsyncSnapshot<Map> snapshot) {
             return snapshot.hasData
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      snapshot.data!
+                      snapshot.data?["active"] == "1"
                           ? Icon(Icons.check, color: Colors.green, size: 100)
                           : Icon(Icons.close, color: Colors.red, size: 100),
                       Text(
-                        snapshot.data!
+                        snapshot.data?["active"] == "1"
                             ? "Empleado Activo"
                             : "Empleado NO pertence a la empresa",
                       ),
+                      Text(snapshot.data!["name"].toString()),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 50.0,
@@ -65,15 +68,30 @@ class _VerifyPageState extends State<VerifyPage> {
     );
   }
 
-  Future<bool> apiCall(String id) async {
-    String key = "C-S8sSG5-P9q]?kV%3Ex-j%7BvJ]KMqo%5E=bXLH%3EbTi";
-    String base = "https://api.blackvector.com/getVerifyActiveEmployee";
-    String data =
-        "?identificacion=$id&codigoMarca=&usuario=admintractores&key=";
+  Future<Map<String, String>> apiCall(String id) async {
+    String key = "C-S8sSG5-P9q]?kV%3Ex-j{vJ]KMqo^=bXLH%3EbTi";
+    String base = "https://api.blackvector.com//getVerifyActiveEmployeeV2";
+    String data = "?identificacion=$id&codigoMarca=&key=";
 
     final uri = Uri.parse("$base$data$key");
     // api call
     final response = await http.get(uri);
-    return response.body == "1" ? true : false;
+    // ignore: avoid_print
+    print(response.body);
+    final jsonResponse = jsonDecode(response.body);
+    print(jsonResponse);
+    if (jsonResponse == null) {
+      return {"active": "0", "name": ""};
+    }
+    return jsonResponse["activo"] == "1" || jsonResponse["activo"] == true
+        ? {
+            "active": "1",
+            "name": jsonResponse['nombre'] +
+                " " +
+                jsonResponse['apellido_uno'] +
+                " " +
+                jsonResponse['apellido_dos'],
+          }
+        : {"active": "0", "name": ""};
   }
 }
