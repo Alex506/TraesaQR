@@ -83,7 +83,8 @@ class _VerifyPageState extends State<VerifyPage> {
     if (jsonResponse == null) {
       return {"active": "0", "name": ""};
     }
-    return jsonResponse["activo"] == "1" || jsonResponse["activo"] == true
+    return jsonResponse["activo"].toString() == "1" ||
+            jsonResponse["activo"] == true
         ? {
             "active": "1",
             "name": jsonResponse['nombre'] +
@@ -92,6 +93,9 @@ class _VerifyPageState extends State<VerifyPage> {
                 " " +
                 jsonResponse['apellido_dos'],
           }
-        : {"active": "0", "name": ""};
+        : {
+            "active": "0",
+            "name": "",
+          };
   }
 }
